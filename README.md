@@ -1,2 +1,1 @@
-# scalac-task
-Task for Scalac
+# Hundred Jokes API
