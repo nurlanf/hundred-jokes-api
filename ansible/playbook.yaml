@@ -1,0 +1,56 @@
+---
+    - hosts: localhost
+      become: true
+    #   vars_files:
+    #     - vars/default.yml
+    
+      tasks:
+        - name: Install aptitude using apt
+          apt: name=aptitude state=latest update_cache=yes force_apt_get=yes
+    
+        - name: Install required system packages
+          apt: name={{ item }} state=latest update_cache=yes
+          loop: [ 'apt-transport-https', 'ca-certificates', 'curl', 'software-properties-common', 'python3-pip', 'gnupg-agent', 'locales-all']
+    
+        - name: Add Docker GPG apt Key
+          apt_key:
+            url: https://download.docker.com/linux/debian/gpg
+            state: present
+    
+        - name: Add Docker Repository
+          apt_repository:
+            repo: deb https://download.docker.com/linux/debian buster stable
+            state: present
+    
+        - name: Install docker-ce and docker-compose
+          apt: update_cache=yes name={{ item }} state=latest
+          loop: ['docker-ce','docker-compose']
+    
+        - name: Install Docker Module for Python
+          pip:
+            name: docker
+
+        - name: Add the user 'admin' to 'docker' group
+          user:
+            name: admin
+            groups: docker
+            append: yes
+
+        - name: Start service docker, if not started
+          service:
+            name: docker
+            state: started
+
+        - name: Create Jenkins home directory if it does not exist
+          file:
+            path: "/home/admin/jenkins_home"
+            state: directory
+            mode: '0755'
+
+        - name: Create and start services
+          community.general.docker_compose:
+            project_src: /home/admin/jenkins
+          register: output
+    
+        - ansible.builtin.debug:
+            var: output
