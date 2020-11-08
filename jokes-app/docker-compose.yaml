@@ -1,7 +1,7 @@
 version: '3.3'
 services:
   jokes-api:
-    image: jokes-api
+    image: jokes-api:dev
     ports:
       - 5000:5000
     container_name: jokes-api

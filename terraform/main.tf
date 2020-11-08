@@ -13,7 +13,7 @@ provider "aws" {
 
 resource "aws_key_pair" "debian" {
   key_name   = "debian-key"
-  public_key = file("/tmp/debian.pub")
+  public_key = file(var.ssh_key_public)
 }
 
 # Create a instance
@@ -32,16 +32,17 @@ resource "aws_instance" "app" {
   }
 
   provisioner "file" {
-    source      = "../files/"
+    source      = "../ansible"
     destination = "/home/admin"
 
   }
 
   provisioner "remote-exec" {
     inline = [
+      # Install ansible related
       "sudo apt -y update && sudo apt install python3-pip -y",
       "sudo pip3 install ansible",
-      "ansible-galaxy collection install community.docker",
+      # Run ansible playbook
       "ansible-playbook -i localhost /home/admin/ansible/playbook.yaml"
       ]
   }
