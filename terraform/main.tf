@@ -8,19 +8,19 @@ terraform {
 }
 
 provider "aws" {
-  region = "eu-west-2"
+  region = var.aws_region
 }
 
 resource "aws_key_pair" "debian" {
-  key_name   = "debian-key"
+  key_name   = var.key_pair_name
   public_key = file(var.ssh_key_public)
 }
 
 # Create a instance
 resource "aws_instance" "app" {
   key_name = aws_key_pair.debian.key_name
-  ami           = "ami-02c4ed7894cd35a3f"
-  instance_type = "t2.micro"
+  ami           = var.ami
+  instance_type = var.aws_instance_type
   subnet_id     = aws_subnet.subnet.id
   vpc_security_group_ids = [aws_security_group.sg.id]
 
@@ -34,7 +34,6 @@ resource "aws_instance" "app" {
   provisioner "file" {
     source      = "../ansible"
     destination = "/home/admin"
-
   }
 
   provisioner "remote-exec" {
