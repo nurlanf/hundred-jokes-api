@@ -39,7 +39,7 @@ resource "aws_instance" "app" {
 
   provisioner "remote-exec" {
     inline = [
-      # Install ansible related
+      # Install ansible related packages
       "sudo apt -y update && sudo apt install python3-pip -y",
       "sudo pip3 install ansible",
       # Run ansible playbook
