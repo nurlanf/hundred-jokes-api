@@ -16,4 +16,6 @@ COPY ./jokes-app /jokes-app
 HEALTHCHECK --interval=5m --timeout=3s \
   CMD curl -f http://localhost:5000/api/jokes || exit 1
 
+EXPOSE 5000
+
 ENTRYPOINT ["gunicorn", "--bind", "0.0.0.0:5000", "--chdir", "/jokes-app", "hundred_jokes_api:app"]
